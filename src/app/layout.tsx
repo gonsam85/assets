@@ -5,6 +5,11 @@ import BottomNav from '@/components/layout/BottomNav';
 export const metadata: Metadata = {
   title: 'My Wealth',
   description: 'Neo-Brutalism Asset Management',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 import { AssetProvider } from '@/context/AssetContext';
