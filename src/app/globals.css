@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  /* Neo-Brutalism Color Palette */
+  --neo-black: #000000;
+  --neo-white: #FFFFFF;
+  --neo-yellow: #FFDE00;
+  --neo-pink: #FF5ACD;
+  --neo-blue: #335CFF;
+  --neo-orange: #FF9100;
+  --neo-green: #00E054;
+
+  /* Backgrounds */
+  --background: var(--neo-white);
+  --foreground: var(--neo-black);
+}
+
+@theme inline {
+  --color-neo-black: var(--neo-black);
+  --color-neo-white: var(--neo-white);
+  --color-neo-yellow: var(--neo-yellow);
+  --color-neo-pink: var(--neo-pink);
+  --color-neo-blue: var(--neo-blue);
+  --color-neo-orange: var(--neo-orange);
+  --color-neo-green: var(--neo-green);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Shadows */
+  --shadow-neo-sm: 2px 2px 0px 0px #000;
+  --shadow-neo: 4px 4px 0px 0px #000;
+  --shadow-neo-lg: 8px 8px 0px 0px #000;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, sans-serif; /* Fallback to a clean sans */
+}
+
+/* Custom Utility for Borders */
+.neo-border {
+  border: 3px solid var(--neo-black);
+}
+
+/* Utilities */
+@layer utilities {
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
