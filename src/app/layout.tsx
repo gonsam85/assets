@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: 'My Wealth',
   description: 'Neo-Brutalism Asset Management',
   icons: {
-    icon: '/icon.svg',
-    shortcut: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/apple-icon.png',
   },
 };
 
