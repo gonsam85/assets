@@ -123,7 +123,7 @@ export default function ReportPage() {
             </NeoCard>
 
             {/* 2. Composition Trend (Stacked Bar) */}
-            <NeoCard color="yellow" className="border-3 border-neo-black relative">
+            <NeoCard color="pink" className="border-3 border-neo-black relative">
                 <h2 className="font-black text-xl mb-4">🧱 Asset Composition</h2>
                 <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
@@ -144,7 +144,7 @@ export default function ReportPage() {
                                     color: '#000'
                                 }}
                             />
-                            <Bar dataKey="real_estate" name="Realty" stackId="a" fill="#FF5ACD" stroke="#000" strokeWidth={1} />
+                            <Bar dataKey="real_estate" name="Realty" stackId="a" fill="#FFDE00" stroke="#000" strokeWidth={1} />
                             <Bar dataKey="stock" name="Stock" stackId="a" fill="#335CFF" stroke="#000" strokeWidth={1} />
                             <Bar dataKey="crypto" name="Crypto" stackId="a" fill="#00E054" stroke="#000" strokeWidth={1} />
                             <Bar dataKey="cash" name="Cash" stackId="a" fill="#FF9100" stroke="#000" strokeWidth={1} />
