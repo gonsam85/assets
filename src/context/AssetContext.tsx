@@ -79,6 +79,26 @@ export function AssetProvider({ children }: { children: React.ReactNode }) {
     }, [assets, userSettings, isLoaded]);
 
     const addAsset = (newAsset: Omit<Asset, 'id' | 'date'>) => {
+        // Aggregate Cash with same name
+        if (newAsset.type === 'cash') {
+            const existingIndex = assets.findIndex(a =>
+                a.type === 'cash' &&
+                a.name === newAsset.name
+            );
+
+            if (existingIndex !== -1) {
+                const existing = assets[existingIndex];
+                const updatedAssets = [...assets];
+                updatedAssets[existingIndex] = {
+                    ...existing,
+                    amount: existing.amount + newAsset.amount,
+                    date: new Date().toISOString()
+                };
+                setAssets(updatedAssets);
+                return;
+            }
+        }
+
         // Aggregate Stock/Crypto with same ticker
         if ((newAsset.type === 'stock' || newAsset.type === 'crypto') && newAsset.ticker) {
             const existingIndex = assets.findIndex(a =>
