@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 interface NeoCardProps {
     children: ReactNode;
     className?: string;
-    color?: 'white' | 'yellow' | 'pink' | 'blue' | 'orange' | 'green';
+    color?: 'white' | 'yellow' | 'pink' | 'blue' | 'orange' | 'green' | 'red';
     onClick?: () => void;
 }
 
@@ -16,6 +16,7 @@ export default function NeoCard({ children, className, color = 'white', onClick 
         blue: 'bg-neo-blue',
         orange: 'bg-neo-orange',
         green: 'bg-neo-green',
+        red: 'bg-neo-red',
     };
 
     return (

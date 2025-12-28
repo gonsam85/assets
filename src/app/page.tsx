@@ -232,9 +232,9 @@ export default function Home() {
             const cardColor = item.type === 'stock' ? 'blue' :
               item.type === 'crypto' ? 'green' :
                 item.type === 'real_estate' ? 'yellow' :
-                  item.type === 'loan' ? 'pink' : 'orange';
+                  item.type === 'loan' ? 'red' : 'orange';
 
-            const isDarkBg = ['stock', 'loan', 'pink', 'blue'].includes(cardColor);
+            const isDarkBg = ['stock', 'loan', 'pink', 'blue', 'red'].includes(cardColor);
 
             return (
               <motion.div

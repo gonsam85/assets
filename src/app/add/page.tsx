@@ -65,7 +65,7 @@ function AddEditContent() {
         { id: 'stock', icon: LineChart, label: 'Stock', color: 'bg-neo-blue' },
         { id: 'crypto', icon: BadgeDollarSign, label: 'Crypto', color: 'bg-neo-green', textColor: 'text-neo-black' },
         { id: 'real_estate', icon: Building2, label: 'Realty', color: 'bg-neo-yellow', textColor: 'text-neo-black' },
-        { id: 'loan', icon: Landmark, label: 'Loan', color: 'bg-neo-pink' },
+        { id: 'loan', icon: Landmark, label: 'Loan', color: 'bg-neo-red' },
     ];
 
     const handleSubmit = (e: React.FormEvent) => {

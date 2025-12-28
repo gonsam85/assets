@@ -17,12 +17,12 @@ export default function LoanPage() {
 
     return (
         <div className="p-4 pt-8 pb-24 space-y-6">
-            <h1 className="text-4xl font-black bg-neo-orange text-neo-black inline-block px-2 border-3 border-neo-black shadow-neo-sm">
+            <h1 className="text-4xl font-black bg-neo-red text-neo-black inline-block px-2 border-3 border-neo-black shadow-neo-sm">
                 LOANS
             </h1>
 
             {/* Total Debt Card */}
-            <NeoCard color="pink" className="border-3 border-neo-black p-3">
+            <NeoCard color="red" className="border-3 border-neo-black p-3">
                 <p className="font-bold text-sm mb-1 text-white opacity-90">Total Liabilities</p>
                 <div className="text-2xl font-black text-white leading-none">
                     {formatCurrency(totalDebt)}
@@ -35,7 +35,7 @@ export default function LoanPage() {
                 {loans.length > 0 ? (
                     loans.map((loan) => (
                         <motion.div key={loan.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                            <NeoCard color="pink" className="flex justify-between items-center py-2 px-3">
+                            <NeoCard color="red" className="flex justify-between items-center py-2 px-3">
                                 <div>
                                     <div className="font-black text-sm text-white">{loan.name}</div>
                                     <div className="text-[10px] font-bold text-neo-black bg-white inline-block px-1 mt-0.5 border border-black">

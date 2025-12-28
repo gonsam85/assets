@@ -14,7 +14,7 @@ const ASSET_COLORS: Record<string, string> = {
     'crypto': '#00E054',     // Neo Green
     'real_estate': '#FFDE00', // Neo Yellow
     'cash': '#FF9100',       // Neo Orange
-    'loan': '#FF5ACD',       // Neo Pink
+    'loan': '#FF1F1F',       // Neo Red
 };
 
 export default function PortfolioPage() {
