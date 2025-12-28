@@ -60,12 +60,12 @@ function AddEditContent() {
         }
     }, [editId, assets]);
 
-    const assetTypes: { id: AssetType; icon: any; label: string; color: string }[] = [
-        { id: 'cash', icon: Wallet, label: 'Cash', color: 'bg-neo-green' },
+    const assetTypes: { id: AssetType; icon: any; label: string; color: string; textColor?: string }[] = [
+        { id: 'cash', icon: Wallet, label: 'Cash', color: 'bg-neo-orange' },
         { id: 'stock', icon: LineChart, label: 'Stock', color: 'bg-neo-blue' },
-        { id: 'crypto', icon: BadgeDollarSign, label: 'Crypto', color: 'bg-neo-pink' },
-        { id: 'real_estate', icon: Building2, label: 'Realty', color: 'bg-neo-orange' },
-        { id: 'loan', icon: Landmark, label: 'Loan', color: 'bg-red-500' },
+        { id: 'crypto', icon: BadgeDollarSign, label: 'Crypto', color: 'bg-neo-green', textColor: 'text-neo-black' },
+        { id: 'real_estate', icon: Building2, label: 'Realty', color: 'bg-neo-yellow', textColor: 'text-neo-black' },
+        { id: 'loan', icon: Landmark, label: 'Loan', color: 'bg-neo-pink' },
     ];
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -147,7 +147,7 @@ function AddEditContent() {
                                     onClick={() => setFormData({ ...formData, type: type.id })}
                                     className={clsx(
                                         "cursor-pointer border-3 border-neo-black p-3 flex flex-col items-center justify-center transition-all",
-                                        isSelected ? `${type.color} text-white shadow-neo -translate-y-1` : "bg-white text-neo-black hover:bg-gray-50"
+                                        isSelected ? `${type.color} ${type.textColor || 'text-white'} shadow-neo -translate-y-1` : "bg-white text-neo-black hover:bg-gray-50"
                                     )}
                                 >
                                     <type.icon size={24} strokeWidth={2.5} />
