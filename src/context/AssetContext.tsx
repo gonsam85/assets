@@ -21,8 +21,22 @@ export interface Asset {
     ticker?: string;       // For Stock/Crypto (e.g., AAPL, BTC-USD)
 }
 
+export interface AssetHistory {
+    date: string; // "YYYY-MM"
+    totalAssets: number;
+    netWorth: number;
+    composition: {
+        stock: number;
+        real_estate: number;
+        crypto: number;
+        cash: number;
+        loan: number;
+    };
+}
+
 interface AssetContextType {
     assets: Asset[];
+    history: AssetHistory[];
     netWorth: number;
     addAsset: (asset: Omit<Asset, 'id' | 'date'>) => void;
     removeAsset: (id: string) => void;
@@ -30,6 +44,7 @@ interface AssetContextType {
     updateAsset: (asset: Asset) => void;
     userSettings: UserSettings;
     updateUserSettings: (settings: Partial<UserSettings>) => void;
+    recordSnapshot: (dateKey: string, data: AssetHistory) => void;
 }
 
 export interface UserSettings {
@@ -41,6 +56,7 @@ const AssetContext = createContext<AssetContextType | undefined>(undefined);
 
 export function AssetProvider({ children }: { children: React.ReactNode }) {
     const [assets, setAssets] = useState<Asset[]>([]);
+    const [history, setHistory] = useState<AssetHistory[]>([]);
     const [userSettings, setUserSettings] = useState<UserSettings>({
         nickname: 'Rich',
         fireGoal: 100000000,
@@ -51,6 +67,7 @@ export function AssetProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const savedAssets = localStorage.getItem('my_wealth_assets');
         const savedSettings = localStorage.getItem('my_wealth_settings');
+        const savedHistory = localStorage.getItem('my_wealth_history');
 
         if (savedAssets) {
             setAssets(JSON.parse(savedAssets));
@@ -67,6 +84,10 @@ export function AssetProvider({ children }: { children: React.ReactNode }) {
             setUserSettings(JSON.parse(savedSettings));
         }
 
+        if (savedHistory) {
+            setHistory(JSON.parse(savedHistory));
+        }
+
         setIsLoaded(true);
     }, []);
 
@@ -75,8 +96,9 @@ export function AssetProvider({ children }: { children: React.ReactNode }) {
         if (isLoaded) {
             localStorage.setItem('my_wealth_assets', JSON.stringify(assets));
             localStorage.setItem('my_wealth_settings', JSON.stringify(userSettings));
+            localStorage.setItem('my_wealth_history', JSON.stringify(history));
         }
-    }, [assets, userSettings, isLoaded]);
+    }, [assets, userSettings, history, isLoaded]);
 
     const addAsset = (newAsset: Omit<Asset, 'id' | 'date'>) => {
         // Aggregate Cash with same name
@@ -154,6 +176,21 @@ export function AssetProvider({ children }: { children: React.ReactNode }) {
         return assets.filter((asset) => asset.type === type);
     };
 
+    const recordSnapshot = (dateKey: string, data: AssetHistory) => {
+        setHistory(prev => {
+            // Check if exists
+            const existingIndex = prev.findIndex(h => h.date === dateKey);
+            if (existingIndex !== -1) {
+                // Update existing
+                const updated = [...prev];
+                updated[existingIndex] = data;
+                return updated.sort((a, b) => a.date.localeCompare(b.date));
+            }
+            // Add new
+            return [...prev, data].sort((a, b) => a.date.localeCompare(b.date));
+        });
+    };
+
     // Calculate Net Worth (Assets - Loans)
     const netWorth = assets.reduce((total, asset) => {
         if (asset.type === 'loan') {
@@ -163,7 +200,7 @@ export function AssetProvider({ children }: { children: React.ReactNode }) {
     }, 0);
 
     return (
-        <AssetContext.Provider value={{ assets, netWorth, userSettings, addAsset, updateAsset, removeAsset, updateUserSettings, getAssetsByType }}>
+        <AssetContext.Provider value={{ assets, history, netWorth, userSettings, addAsset, updateAsset, removeAsset, updateUserSettings, getAssetsByType, recordSnapshot }}>
             {children}
         </AssetContext.Provider>
     );
