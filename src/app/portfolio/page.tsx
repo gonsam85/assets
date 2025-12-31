@@ -23,7 +23,7 @@ export default function PortfolioPage() {
     const [expandedAssetId, setExpandedAssetId] = useState<string | null>(null);
 
     // Real-time Data State
-    const [prices, setPrices] = useState<Record<string, number>>({});
+    const [prices, setPrices] = useState<Record<string, { price: number, prevClose: number }>>({});
     const [exchangeRate, setExchangeRate] = useState<number>(1400);
 
     const filteredAssets = assets.filter(a => a.type !== 'loan');
@@ -50,14 +50,17 @@ export default function PortfolioPage() {
             fetch(`/api/price?tickers=${query}`)
                 .then(res => res.json())
                 .then(data => {
-                    const newPrices: Record<string, number> = {};
+                    const newPrices: Record<string, { price: number, prevClose: number }> = {};
 
                     if (Array.isArray(data)) {
                         data.forEach((item: any) => {
                             // Map ticker price to all relevant assets
                             filteredAssets.forEach(asset => {
                                 if (asset.ticker === item.ticker) {
-                                    newPrices[asset.id] = item.price;
+                                    newPrices[asset.id] = {
+                                        price: item.price,
+                                        prevClose: item.prevClose || item.price
+                                    };
                                 }
                             });
                         });
@@ -70,8 +73,10 @@ export default function PortfolioPage() {
 
     const getRealTimeValue = (asset: any) => {
         // Only use real-time price if valid (> 0)
-        if (asset.ticker && prices[asset.id] && prices[asset.id] > 0 && asset.quantity) {
-            let val = prices[asset.id] * asset.quantity;
+        // Check if price object exists and price > 0
+        const priceData = prices[asset.id];
+        if (asset.ticker && priceData && priceData.price > 0 && asset.quantity) {
+            let val = priceData.price * asset.quantity;
             if (asset.currency === 'USD') val *= exchangeRate;
             return val;
         }
@@ -110,14 +115,23 @@ export default function PortfolioPage() {
             currentPrice = asset.currentPrice || 0;
         } else {
             // For Stock/Crypto, need valid API price and quantity
-            if (!asset.purchasePrice || !asset.quantity || !prices[asset.id] || prices[asset.id] <= 0) return null;
-            currentPrice = prices[asset.id];
+            const priceData = prices[asset.id];
+            if (!asset.purchasePrice || !asset.quantity || !priceData || priceData.price <= 0) return null;
+            currentPrice = priceData.price;
         }
 
         if (buyPrice === 0) return null;
 
         const roi = ((currentPrice - buyPrice) / buyPrice) * 100;
         return roi;
+    };
+
+    const calculateDailyChange = (asset: any) => {
+        const priceData = prices[asset.id];
+        if (!priceData || !priceData.prevClose) return null;
+
+        const change = ((priceData.price - priceData.prevClose) / priceData.prevClose) * 100;
+        return change;
     };
 
     return (
@@ -212,6 +226,23 @@ export default function PortfolioPage() {
                                     </div>
                                     <div className="text-right">
                                         <div className={clsx("font-bold text-sm", isDarkBg ? "text-white" : "text-neo-black")}>{formatCurrency(realTimeVal)}</div>
+                                        {/* Daily Change Badge */}
+                                        {(asset.type === 'stock' || asset.type === 'crypto') && (
+                                            (() => {
+                                                const dailyChange = calculateDailyChange(asset);
+                                                if (dailyChange !== null) {
+                                                    return (
+                                                        <div className={clsx(
+                                                            "text-[10px] font-bold mt-0.5",
+                                                            dailyChange >= 0 ? (isDarkBg ? "text-neo-green" : "text-green-600") : "text-red-500"
+                                                        )}>
+                                                            {dailyChange > 0 ? '▲' : '▼'} {Math.abs(dailyChange).toFixed(2)}%
+                                                        </div>
+                                                    );
+                                                }
+                                                return null;
+                                            })()
+                                        )}
                                         {isExpanded ? <ChevronUp size={16} className={clsx("ml-auto mt-0.5", isDarkBg ? "text-white/80" : "text-gray-400")} /> : <ChevronDown size={16} className={clsx("ml-auto mt-0.5", isDarkBg ? "text-white/80" : "text-gray-400")} />}
                                     </div>
                                 </div>
@@ -251,10 +282,10 @@ export default function PortfolioPage() {
                                                             <span>Avg Price</span>
                                                             <span className="font-bold">{formatCurrency(asset.purchasePrice || 0, asset.currency)}</span>
                                                         </div>
-                                                        {prices[asset.id] && prices[asset.id] > 0 && (
+                                                        {prices[asset.id] && prices[asset.id].price > 0 && (
                                                             <div className="flex justify-between">
                                                                 <span>Current Price</span>
-                                                                <span className="font-bold">{formatCurrency(prices[asset.id], asset.currency)}</span>
+                                                                <span className="font-bold">{formatCurrency(prices[asset.id].price, asset.currency)}</span>
                                                             </div>
                                                         )}
                                                         <div className="pt-1 mt-1 border-t border-black/10"></div>
