@@ -113,8 +113,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 60000); // 1 min refresh
-    return () => clearInterval(interval);
+    // Auto-refresh removed to conserve Netlify Function limits
   }, [assets]);
 
   // Use real-time values if available, otherwise static
