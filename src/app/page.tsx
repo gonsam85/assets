@@ -124,9 +124,12 @@ export default function Home() {
   const totalLoans = assets.filter(a => a.type === 'loan').reduce((sum, a) => sum + a.amount, 0);
   const displayNetWorth = displayTotalAssets - totalLoans;
 
-  // Percentage
+  // Percentage Calculations
   const prevTotalAssets = displayTotalAssets - dailyChange;
-  const dailyPercent = prevTotalAssets !== 0 ? (dailyChange / prevTotalAssets) * 100 : 0;
+  const dailyTotalPercent = prevTotalAssets !== 0 ? (dailyChange / prevTotalAssets) * 100 : 0;
+
+  const prevNetWorth = displayNetWorth - dailyChange;
+  const dailyNetWorthPercent = prevNetWorth !== 0 ? (dailyChange / prevNetWorth) * 100 : 0;
 
   const GOAL_AMOUNT = userSettings?.fireGoal || 100000000;
   const progress = Math.max(0, Math.min((displayNetWorth / GOAL_AMOUNT) * 100, 100));
@@ -203,7 +206,7 @@ export default function Home() {
                 {dailyChange > 0 ? '+' : ''}{formatCurrency(dailyChange)}
               </span>
               <span className={clsx("text-[10px] font-bold", dailyChange >= 0 ? "text-neo-green" : "text-red-300")}>
-                {dailyChange > 0 ? '▲' : '▼'} {Math.abs(dailyPercent).toFixed(2)}%
+                {dailyChange > 0 ? '▲' : '▼'} {Math.abs(dailyTotalPercent).toFixed(2)}%
               </span>
             </div>
           </div>
@@ -227,7 +230,7 @@ export default function Home() {
                 {dailyChange > 0 ? '+' : ''}{formatCurrency(dailyChange)}
               </span>
               <span className={clsx("text-[10px] font-bold", dailyChange >= 0 ? "text-green-600" : "text-red-600")}>
-                {dailyChange > 0 ? '▲' : '▼'} {Math.abs(dailyPercent).toFixed(2)}%
+                {dailyChange > 0 ? '▲' : '▼'} {Math.abs(dailyNetWorthPercent).toFixed(2)}%
               </span>
             </div>
           </div>
