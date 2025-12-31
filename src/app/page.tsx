@@ -38,50 +38,68 @@ export default function Home() {
     let currentTotalValue = 0;
 
     try {
-      // Exchange Rate
+      // 1. Exchange Rate
       const fxRes = await fetch('/api/price?ticker=KRW=X');
       const fxData = await fxRes.json();
       const currentRate = fxData.price || 1400;
       setExchangeRate(currentRate);
 
-      // Process all assets
-      await Promise.all(assets.map(async (asset) => {
+      // 2. Identify Tickers to Fetch
+      const tickersToFetch = assets
+        .filter(a => (a.type === 'stock' || a.type === 'crypto') && a.ticker)
+        .map(a => a.ticker)
+        .filter((t): t is string => !!t) // Ensure string
+        .filter((t, i, arr) => arr.indexOf(t) === i); // Unique
+
+      // 3. Batch Fetch
+      let priceMap = new Map<string, any>();
+      if (tickersToFetch.length > 0) {
+        try {
+          const query = tickersToFetch.join(',');
+          const res = await fetch(`/api/price?tickers=${query}`);
+          const data = await res.json();
+
+          if (Array.isArray(data)) {
+            data.forEach((item: any) => {
+              priceMap.set(item.ticker, item);
+            });
+          }
+        } catch (e) {
+          console.error("Batch fetch failed", e);
+        }
+      }
+
+      // 4. Calculate Values
+      assets.forEach(asset => {
         let assetValue = asset.amount;
         let changeTotal = 0;
 
+        // Apply Real-time Price if available
         if ((asset.type === 'stock' || asset.type === 'crypto') && asset.ticker) {
-          try {
-            const res = await fetch(`/api/price?ticker=${asset.ticker}`);
-            const data = await res.json();
+          const data = priceMap.get(asset.ticker);
+          if (data && data.price) {
+            let price = data.price;
+            let prevClose = data.prevClose || price;
 
-            if (data.price) {
-              // Calculate Real-time Value
-              let price = data.price;
-              let prevClose = data.prevClose || price;
-
-              // Convert USD to KRW if needed
-              if (asset.currency === 'USD') {
-                price *= currentRate;
-                prevClose *= currentRate;
-              }
-
-              // Value = Price * Quantity
-              if (asset.quantity) {
-                assetValue = price * asset.quantity;
-                changeTotal = (price - prevClose) * asset.quantity;
-              }
+            // Convert USD
+            if (asset.currency === 'USD') {
+              price *= currentRate;
+              prevClose *= currentRate;
             }
-          } catch (e) {
-            console.error(`Error fetching ${asset.ticker}`, e);
+
+            if (asset.quantity) {
+              assetValue = price * asset.quantity;
+              changeTotal = (price - prevClose) * asset.quantity;
+            }
           }
         }
 
-        // Sum up
+        // Sum up (Skip Loan for Total Assets)
         if (asset.type !== 'loan') {
           currentTotalValue += assetValue;
           calculatedChange += changeTotal;
         }
-      }));
+      });
 
       setDailyChange(calculatedChange);
       setRealTimeTotalAssets(currentTotalValue);

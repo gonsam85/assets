@@ -38,25 +38,35 @@ export default function PortfolioPage() {
             })
             .catch(e => console.error('Failed to fetch exchange rate', e));
 
-        // Asset Prices
-        filteredAssets.forEach(asset => {
-            if (asset.ticker) {
-                fetch(`/api/price?ticker=${asset.ticker}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.price) {
-                            setPrices(prev => ({ ...prev, [asset.id]: data.price }));
-                        } else {
-                            setPrices(prev => ({ ...prev, [asset.id]: -1 })); // Data missing
-                        }
-                    })
-                    .catch(e => {
-                        console.error(`Failed to fetch price for ${asset.ticker}`, e);
-                        setPrices(prev => ({ ...prev, [asset.id]: -1 })); // Network Error
-                    });
-            }
-        });
-    }, [assets.length]);
+        // Asset Prices (Batch)
+        const tickersToFetch = filteredAssets
+            .filter(a => a.ticker)
+            .map(a => a.ticker)
+            .filter((t): t is string => !!t)
+            .filter((t, i, arr) => arr.indexOf(t) === i); // Unique
+
+        if (tickersToFetch.length > 0) {
+            const query = tickersToFetch.join(',');
+            fetch(`/api/price?tickers=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    const newPrices: Record<string, number> = {};
+
+                    if (Array.isArray(data)) {
+                        data.forEach((item: any) => {
+                            // Map ticker price to all relevant assets
+                            filteredAssets.forEach(asset => {
+                                if (asset.ticker === item.ticker) {
+                                    newPrices[asset.id] = item.price;
+                                }
+                            });
+                        });
+                        setPrices(prev => ({ ...prev, ...newPrices }));
+                    }
+                })
+                .catch(e => console.error("Batch fetch failed", e));
+        }
+    }, [assets]);
 
     const getRealTimeValue = (asset: any) => {
         // Only use real-time price if valid (> 0)
