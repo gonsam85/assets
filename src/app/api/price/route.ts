@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 // Force dynamic to ensure API is not statically pre-rendered (which might trigger build time exec issues)
 export const dynamic = 'force-dynamic';
 
+// Global instance cache to reuse crumbs/sessions
+let yfInstance: any = null;
+
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const ticker = searchParams.get('ticker');
@@ -13,13 +16,19 @@ export async function GET(request: Request) {
     }
 
     try {
-        const pkg = require('yahoo-finance2');
-        const YahooFinance = pkg.default || pkg;
-        const yf = new YahooFinance();
+        // Lazy Initialization (Singleton)
+        if (!yfInstance) {
+            console.log("Initializing new YahooFinance instance...");
+            const pkg = require('yahoo-finance2');
+            const YahooFinance = pkg.default || pkg;
+            yfInstance = new YahooFinance();
 
-        if (yf.suppressNotices) {
-            yf.suppressNotices(['yahooSurvey']);
+            if (yfInstance.suppressNotices) {
+                yfInstance.suppressNotices(['yahooSurvey']);
+            }
         }
+
+        const yf = yfInstance;
 
         if (tickersParam) {
             const symbols = tickersParam.split(',').map(s => s.trim()).filter(s => s.length > 0);
