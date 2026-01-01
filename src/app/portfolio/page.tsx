@@ -56,7 +56,7 @@ export default function PortfolioPage() {
                         data.forEach((item: any) => {
                             // Map ticker price to all relevant assets
                             filteredAssets.forEach(asset => {
-                                if (asset.ticker === item.ticker) {
+                                if (asset.ticker?.toUpperCase().trim() === item.ticker?.toUpperCase().trim()) {
                                     newPrices[asset.id] = {
                                         price: item.price,
                                         prevClose: item.prevClose || item.price
