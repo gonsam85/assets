@@ -21,7 +21,13 @@ export async function GET(request: Request) {
             console.log("Initializing new YahooFinance instance...");
             const pkg = require('yahoo-finance2');
             const YahooFinance = pkg.default || pkg;
-            yfInstance = new YahooFinance();
+            yfInstance = new YahooFinance({
+                fetchOptions: {
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+                    }
+                }
+            });
 
             if (yfInstance.suppressNotices) {
                 yfInstance.suppressNotices(['yahooSurvey']);
