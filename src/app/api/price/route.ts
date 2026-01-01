@@ -31,7 +31,7 @@ async function fetchRawPrice(ticker: string) {
         return {
             ticker: meta.symbol,
             price: meta.regularMarketPrice,
-            prevClose: meta.previousClose,
+            prevClose: meta.chartPreviousClose || meta.previousClose || meta.regularMarketPrice,
             currency: meta.currency,
             symbol: meta.symbol
         };
