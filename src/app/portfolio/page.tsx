@@ -47,7 +47,7 @@ export default function PortfolioPage() {
 
         if (tickersToFetch.length > 0) {
             const query = tickersToFetch.join(',');
-            fetch(`/api/price?tickers=${query}`)
+            fetch(`/api/price?tickers=${query}`, { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     const newPrices: Record<string, { price: number, prevClose: number }> = {};
