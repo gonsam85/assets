@@ -33,7 +33,8 @@ async function fetchRawPrice(ticker: string) {
             price: meta.regularMarketPrice,
             prevClose: meta.chartPreviousClose || meta.previousClose || meta.regularMarketPrice,
             currency: meta.currency,
-            symbol: meta.symbol
+            symbol: meta.symbol,
+            debugMeta: meta
         };
     } catch (e) {
         console.error(`Raw fetch error for ${ticker}:`, e);
