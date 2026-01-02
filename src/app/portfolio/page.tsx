@@ -293,6 +293,15 @@ export default function PortfolioPage() {
                                                             <span>Total Cost</span>
                                                             <span className="font-bold">{formatCurrency((asset.purchasePrice || 0) * asset.quantity, asset.currency)}</span>
                                                         </div>
+                                                        <div className="flex justify-between text-neo-blue">
+                                                            <span>Total Value</span>
+                                                            <span className="font-bold">
+                                                                {prices[asset.id] && prices[asset.id].price > 0
+                                                                    ? formatCurrency(prices[asset.id].price * asset.quantity, asset.currency)
+                                                                    : '-'
+                                                                }
+                                                            </span>
+                                                        </div>
                                                     </>
                                                 )}
 
