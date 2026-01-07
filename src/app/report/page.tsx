@@ -83,25 +83,38 @@ export default function ReportPage() {
     const chartData = useMemo(() => {
         // If no history, return simulation (keep existing logic or simplified)
         if (history.length === 0) {
-            // ... Keep existing simulation logic ...
-            const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const currentTotal = Object.values(currentComposition).reduce((a, b) => a + b, 0) - currentComposition.loan;
+            const today = new Date();
+            const months = Array.from({ length: 6 }, (_, i) => {
+                const d = new Date(today.getFullYear(), today.getMonth() - (5 - i), 1);
+                return d.toLocaleString('en-US', { month: 'short' });
+            });
+
+            const currentGrossAssets = Object.entries(currentComposition)
+                .filter(([k]) => k !== 'loan')
+                .reduce((acc, [, v]) => acc + v, 0);
+
+            const currentLoan = currentComposition.loan;
+
             return months.map((month, i) => {
                 const progress = (i + 1) / 6;
                 const trendFactor = 0.85 + (progress * 0.15);
-                const random = 1 + (Math.random() * 0.05 - 0.025);
-                const simulatedTotal = currentTotal * trendFactor * random;
-                const simulatedLoan = currentComposition.loan * (1 - (progress * 0.05));
-                const baseRatio = simulatedTotal / currentTotal;
+                const random = 1 + (Math.random() * 0.04 - 0.02);
+
+                const simulatedGross = currentGrossAssets * trendFactor * random;
+                const simulatedLoan = currentLoan;
+
+                const simulatedNet = simulatedGross - simulatedLoan;
+                const baseRatio = simulatedGross / (currentGrossAssets || 1);
+
                 return {
                     name: month,
-                    NetWorth: Math.floor(simulatedTotal),
-                    TotalAssets: Math.floor(simulatedTotal + simulatedLoan),
+                    NetWorth: Math.floor(simulatedNet),
+                    TotalAssets: Math.floor(simulatedGross),
                     stock: Math.floor(currentComposition.stock * baseRatio * (1 + Math.random() * 0.1)),
                     real_estate: Math.floor(currentComposition.real_estate * trendFactor),
                     crypto: Math.floor(currentComposition.crypto * baseRatio * (1 + (Math.random() * 0.3 - 0.15))),
                     cash: Math.floor(currentComposition.cash * baseRatio * 0.95),
-                    loan: Math.floor(currentComposition.loan), // Ensure loan is in data
+                    loan: Math.floor(simulatedLoan),
                 };
             });
         }
